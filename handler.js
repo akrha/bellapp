@@ -1,18 +1,29 @@
 'use strict';
 
-module.exports.hello = async (event) => {
+const line = require('@line/bot-sdk');
+const client = new line.Client({
+  channelAccessToken: process.env.LINE_ACCESS_TOKEN
+});
+const userId = process.env.TARGET_USER_ID;
+
+module.exports.ring = async (event) => {
+  const message = {
+    type: 'text',
+    text: '🔴呼び出されています！'
+  };
+
+  let success = true;
+  await client.pushMessage(userId, message)
+    .catch((e) => {
+      success = false;
+      console.log(e);
+    });
   return {
     statusCode: 200,
     body: JSON.stringify(
       {
-        message: 'Go Serverless v1.0! Your function executed successfully!',
-        input: event,
-      },
-      null,
-      2
+        text: `${success ? '通知' : '失敗'}しました！`
+      }
     ),
   };
-
-  // Use this code if you don't use the http event with the LAMBDA-PROXY integration
-  // return { message: 'Go Serverless v1.0! Your function executed successfully!', event };
 };
